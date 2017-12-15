@@ -1,0 +1,3 @@
+//∏Ò Ω RSYNC_MODULE:SOURCE_PATH:RSYNC_EXCLUDE
+aa:cc:ss
+bb:ss:ff

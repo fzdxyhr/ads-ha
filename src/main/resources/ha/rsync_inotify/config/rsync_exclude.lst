@@ -1,0 +1,12 @@
+.??*
+..*
+aria_log.00000001
+aria_log_control
+err.log
+master.info
+multi-master.info
+mysql.pid
+mysql.sock
+relay-log.info
+slow.log
+mysql.log
