@@ -8,8 +8,10 @@ import com.ruijie.adsha.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,13 +33,16 @@ public class AdsHaServiceImpl implements AdsHaService {
         //虚拟ip放在最前面作为sh脚本的参数，具体传值可以查看对应的脚本注释
         reSortIps.add(virtualIp);
         reSortIps.addAll(ips);
+        // ./init_global vistualIp ip1 ip2 ip3 ...
         int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "init_global.sh", reSortIps);
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "INIT/FAIL", "init global fail");
+            //初始化失败直接返回
+            return new ResponseInfo(500, "INIT/FAIL", "init global fail");
         }
         //安装 MYSQL
         //调用远程其他集群中的主机接口，判断是否已经配置好组复制主机
-        boolean isExistRemoteMasterGroup = requestRemote(ips);
+        List<String> otherIps = getOtherIp();
+        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
         //开始安装MYSQL组复制
         if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
             reSortIps.clear();
@@ -117,5 +122,19 @@ public class AdsHaServiceImpl implements AdsHaService {
             log.error(ex.getMessage(), ex);
         }
         return false;
+    }
+
+    //从global.sh文件中获取除本机ip的其他ip
+    private List<String> getOtherIp() {
+        List<String> result = new ArrayList<>();
+        String ipString = ShellCall.callScriptString(ShellCall.COMMON_SHELL_PATH + "sed_value.sh");
+        if (StringUtils.isEmpty(ipString)) {
+            return Collections.emptyList();
+        }
+        String[] ips = ipString.split(",");
+        for (String ip : ips) {
+            result.add(ip);
+        }
+        return result;
     }
 }

@@ -59,4 +59,21 @@ public class ShellCall {
         }
         return 500;
     }
+
+    public static String callScriptString(String command) {
+        try {
+            Process process = Runtime.getRuntime().exec(command);
+            int exitValue = process.waitFor();
+            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = input.readLine()) != null) {
+                System.out.println(line);
+            }
+            input.close();
+            return line;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

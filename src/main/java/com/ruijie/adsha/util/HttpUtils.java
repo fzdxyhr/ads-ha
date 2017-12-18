@@ -7,17 +7,14 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -137,8 +134,8 @@ public class HttpUtils {
                     System.out.println("Response content: " + EntityUtils.toString(entity));
                     return EntityUtils.toString(entity);
                 }
-            } finally {
-                response.close();
+            }catch (Exception ex) {
+
             }
         } catch (ClientProtocolException e) {
             log.error(e.getMessage(), e);
