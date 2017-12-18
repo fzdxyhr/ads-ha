@@ -43,17 +43,17 @@ public class AdsHaServiceImpl implements AdsHaService {
             reSortIps.clear();
             reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
             reSortIps.add(mysqlContainerName);
-            reSortIps.add(virtualIp);
+//            reSortIps.add(virtualIp);
             reSortIps.addAll(ips);
             returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
             if (returnResult != 0) {
                 responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
             }
-        } else { //MYSQL组复制已本机为主,type = master
+        } else { //MYSQL组复制以本机为主,type = master
             reSortIps.clear();
             reSortIps.add(Constant.MYSQL_TYPE_MASTER);
             reSortIps.add(mysqlContainerName);
-            reSortIps.add(virtualIp);
+//            reSortIps.add(virtualIp);
             reSortIps.addAll(ips);
             returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
             if (returnResult != 0) {
