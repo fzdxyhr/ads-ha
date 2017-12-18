@@ -1,10 +1,9 @@
 #!/bin/bash
 
-source /opt/ADS-HA/shell/resource.sh
+source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $PATH/global.sh
-FORMAT_DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
-LOG_PATH=$RUIJIE_HOME/keepalived/log/state_log.log
+LOG_PATH=$HA_PATH/keepalived/logs/state_log.log
 
 ## 更新全局变量
 function updateGlobal(){
@@ -25,7 +24,7 @@ case "$1" in
 		
 		$PATH/switch.sh switch_ha
 		
-		curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=restart"
+		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=restart"
     ;;  
   	backup)  ##当前节点成为backup时，通知脚本执行任务
   	
@@ -36,7 +35,7 @@ case "$1" in
 		
 		$PATH/switch.sh switch_ha
 		
-		curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
+		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
 		
     ;;
     fault)  ##当前节点出现故障，通知脚本执行任务 
@@ -47,7 +46,7 @@ case "$1" in
 		
 		$PATH/switch.sh switch_ha
 		
-		curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
+		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
     ;; 
     stop)  ##当前节点停止，通知脚本执行任务;
 		echo "$FORMAT_DATE : keepalive is stop" >> ${LOG_PATH}

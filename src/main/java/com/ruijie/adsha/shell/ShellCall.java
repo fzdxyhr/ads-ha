@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ShellCall {
 
-    public static final String COMMON_SHELL_PATH = "/opt/ads-ha/ha/shell/";
+    public static final String COMMON_SHELL_PATH = "/opt/ads-ha/WEB-INF/classes/ha/shell/";
 
 
     public static int callScript(String shellPath, String shellName, List<String> params) {

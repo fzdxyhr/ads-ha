@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source /opt/ads-ha/ha/shell/resource.sh
+source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $PATH/global.sh
 
-LOG_PATH=/opt/ads-ha/ha/logs/ha.log
+LOG_PATH=$HA_PATH/rsync_inotify/logs/rsync_install.log
 
 
 #安装Rsync
@@ -41,7 +41,7 @@ function install_rsync () {
 	#start rsync service
 	/usr/local/rsync/bin/rsync --daemon --config=$HA_PATH/rsync_inotify/config/rsyncd.conf
 	sleep 2
-	pid=`ps -ef|grep /opt/ads-ha/ha/rsync_inotify/config/rsyncd.conf |grep -v 'grep' |awk '{print $2}'`
+	pid=`ps -ef|grep $HA_PATH/rsync_inotify/config/rsyncd.conf |grep -v 'grep' |awk '{print $2}'`
 	if [ "$pid" ];then
 		echo "$FORMAT_DATE : rsync service start success" >> $LOG_PATH
 	else

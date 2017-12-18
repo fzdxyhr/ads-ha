@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /opt/ADS-HA/shell/resource.sh
+source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 
 interip=""
 otherIp=""

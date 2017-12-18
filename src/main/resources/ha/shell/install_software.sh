@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source /opt/ads-ha/ha/shell/resource.sh
+source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $PATH/global.sh
 
-LOG_PATH=/opt/ads-ha/ha/logs/ha.log
+LOG_PATH=$HA_PATH/keepalived/logs/install.log
 
 function command_exists () {
     command -v "$1" > /dev/null 2>&1;

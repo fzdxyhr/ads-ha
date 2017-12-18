@@ -1,9 +1,9 @@
 #!/bin/bash
 
-source /opt/ads-ha/ha/shell/resource.sh
+source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $PATH/global.sh
 
-LOCAL_LOG="/opt/ads-ha/ha/keepalived/check_log.log"
+LOCAL_LOG="$HA_PATH/keepalived/logs/check_log.log"
 
 #因为keepalived重试次数设置了3，所以，这个文件要在第三次才去删除
 if [ -e $HA_PATH/psh/Recovery_err ]; then

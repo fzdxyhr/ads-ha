@@ -92,13 +92,13 @@ function main() {
 		
 		## 启动docker mysql 服务
 		##docker run --net=host  --name $2 -p 3306:3306 -v $configDir/my.cnf:/etc/mysql/my.cnf  -e MYSQL_ROOT_PASSWORD=mytest  -d percona/percona-server:latest
-		docker run --net=host  --name $2 -p 3306:3306 -v $configDir/my.cnf:/etc/mysql/my.cnf  -e MYSQL_ROOT_PASSWORD=mytest  -d percona/percona-server:latest
+		##docker run --net=host  --name $2 -p 3306:3306 -v $configDir/my.cnf:/etc/mysql/my.cnf  -e MYSQL_ROOT_PASSWORD=mytest  -d percona/percona-server:latest
 		## 修改mysql my.cnf配置文件
 	    updateMyCnf $@
 		## 重启mysql 
 		docker restart $2
 		
-		sleep 10
+		sleep 2
 		
 		## 用户root授权
 		mysql -h$3 -uroot -pmytest -e "
