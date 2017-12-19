@@ -116,6 +116,7 @@ public class HttpUtils {
      * 发送 get请求
      */
     public static String get(String url, String params) {
+        String result = null;
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             //创建httpget
@@ -131,8 +132,8 @@ public class HttpUtils {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
                     // 打印响应内容
-                    System.out.println("Response content: " + EntityUtils.toString(entity));
-                    return EntityUtils.toString(entity);
+//                    System.out.println("Response content: " + EntityUtils.toString(entity));
+                    result = EntityUtils.toString(entity);
                 }
             }catch (Exception ex) {
 
@@ -149,6 +150,6 @@ public class HttpUtils {
                 log.error(e.getMessage(), e);
             }
         }
-        return null;
+        return result;
     }
 }

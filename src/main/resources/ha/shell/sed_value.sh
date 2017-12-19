@@ -1,3 +1,4 @@
 #!/bin/bash
 
-sed '/otherIp/!d;s/.*=//'  ././global.sh
+otherIp=$(sed '/otherIp/!d;s/.*=//'  /opt/ads-ha/WEB-INF/classes/ha/shell/global.sh)
+echo $otherIp

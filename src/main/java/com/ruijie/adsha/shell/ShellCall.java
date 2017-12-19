@@ -62,15 +62,15 @@ public class ShellCall {
 
     public static String callScriptString(String command) {
         try {
+            StringBuffer result = new StringBuffer();
             Process process = Runtime.getRuntime().exec(command);
-            int exitValue = process.waitFor();
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
-                System.out.println(line);
+                result.append(line);
             }
             input.close();
-            return line;
+            return result.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }

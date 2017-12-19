@@ -1,8 +1,3 @@
-//格式 rsync_module:source_path:RSYNC_EXCLUDE
-aa:cc:ss
-bb:ss:ff
-
-
 #!/bin/bash
 
 cat path.txt | awk 'NR>1' | while read line

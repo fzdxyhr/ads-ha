@@ -62,7 +62,7 @@ function updateMyCnf(){
 	echo "loose-group_replication_group_seeds=\"${address}\"" >> $configDir/my.cnf
 	echo "loose-group_replication_single_primary_mode=off" >> $configDir/my.cnf
 	echo "loose-group_replication_enforce_update_everywhere_checks=on" >> $configDir/my.cnf	
-	echo "skip-grant-tables" >> $configDir/my.cnf
+	#echo "skip-grant-tables" >> $configDir/my.cnf
 }
 
 ## 安装mysql-client
@@ -101,7 +101,7 @@ function main() {
 		sleep 2
 		
 		## 用户root授权
-		mysql -h$3 -uroot -pmytest -e "
+		mysql -h$3 -uroot -proot -e "
 		set global read_only=0;
 		flush privileges;
 		grant all privileges on *.* to '${mysql_user_name}'@'192.168.%' identified by '${mysql_user_password}' with grant option;
@@ -121,7 +121,7 @@ function main() {
 		## 开始构建group replication集群
 		CHANGE MASTER TO MASTER_USER='repl', MASTER_PASSWORD='rlpbright_1927@ys' FOR CHANNEL 'group_replication_recovery';
 		"
-		if [ $1 == 'master' ]; then
+		if [ "$1"x = "master"x ]; then
 			## 设置group_replication_bootstrap_group为ON是为了标示以后加入集群的服务器以这台服务器为基准
 			## 以后加入的就不需要设置
 			mysql -h$3 -u$mysql_user_name -p$mysql_user_password -e "

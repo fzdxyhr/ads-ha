@@ -31,7 +31,7 @@ public class ScheduledTasks {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 12000000)
     public void checkMysqlService() {
         StringBuffer sql = new StringBuffer();
         sql.append("select 1");

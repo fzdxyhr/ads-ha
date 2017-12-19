@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
-source $PATH/global.sh
+source $SHELL_PATH/global.sh
 
 log_file=$HA_PATH/rsync_inotify/log/rsync_client.log
 
@@ -35,7 +35,7 @@ fi
 
 #pull the file from the server to the local
 
-/usr/bin/rsync -auvrtzopgP --exclude-from=${RSYNC_EXCLUDE} --progress --password-file=${rsync_pwd} \
+/usr/local/rsync/bin/rsync -auvrtzopgP --exclude-from=${RSYNC_EXCLUDE} --progress --password-file=${rsync_pwd} \
 ${rsync_user}@${rsync_server}::${rsync_module}  ${source_path} >> ${log_file}
 
 

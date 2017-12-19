@@ -41,37 +41,38 @@ public class AdsHaServiceImpl implements AdsHaService {
         }
         //安装 MYSQL
         //调用远程其他集群中的主机接口，判断是否已经配置好组复制主机
-        List<String> otherIps = getOtherIp();
-        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
-        //开始安装MYSQL组复制
-        if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
-            reSortIps.clear();
-            reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
-            reSortIps.add(mysqlContainerName);
-//            reSortIps.add(virtualIp);
-            reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
-            if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-            }
-        } else { //MYSQL组复制以本机为主,type = master
-            reSortIps.clear();
-            reSortIps.add(Constant.MYSQL_TYPE_MASTER);
-            reSortIps.add(mysqlContainerName);
-//            reSortIps.add(virtualIp);
-            reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
-            if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-            }
-        }
+//        List<String> otherIps = getOtherIp();
+//        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
+//        System.out.println(isExistRemoteMasterGroup);
+//        //开始安装MYSQL组复制
+//        if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
+//            System.out.println("slave");
+//            reSortIps.clear();
+//            reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
+//            reSortIps.add(mysqlContainerName);
+//            reSortIps.addAll(ips);
+//            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+//            if (returnResult != 0) {
+//                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+//            }
+//        } else { //MYSQL组复制以本机为主,type = master
+//            System.out.println("master");
+//            reSortIps.clear();
+//            reSortIps.add(Constant.MYSQL_TYPE_MASTER);
+//            reSortIps.add(mysqlContainerName);
+//            reSortIps.addAll(ips);
+//            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+//            if (returnResult != 0) {
+//                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+//            }
+//        }
         reSortIps.clear();
-        reSortIps.add("start");
-        //安装 rsync
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_rsync.sh", reSortIps);
-        if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
-        }
+        reSortIps.add("install");
+//        //安装 rsync
+//        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_rsync.sh", reSortIps);
+//        if (returnResult != 0) {
+//            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
+//        }
         //安装 keepalived
         returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_keepalived.sh", reSortIps);
         if (returnResult != 0) {
@@ -125,7 +126,7 @@ public class AdsHaServiceImpl implements AdsHaService {
     }
 
     //从global.sh文件中获取除本机ip的其他ip
-    private List<String> getOtherIp() {
+    public List<String> getOtherIp() {
         List<String> result = new ArrayList<>();
         String ipString = ShellCall.callScriptString(ShellCall.COMMON_SHELL_PATH + "sed_value.sh");
         if (StringUtils.isEmpty(ipString)) {

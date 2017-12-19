@@ -1,6 +1,6 @@
 #!/bin/bash
 source /opt/ads-ha/ha/shell/resource.sh
-source $PATH/global.sh
+source $SHELL_PATH/global.sh
 LOG_PATH=$HA_PATH/logs/ha.log
 
 
@@ -22,7 +22,7 @@ inotify_fun(){
 	rsync_module=$2
 	RSYNC_EXCLUDE=$3
 	
-	/usr/bin/inotifywait -mrq --timefmt '%Y/%m/%d-%H:%M:%S' --format '%T %Xe %w%f' \
+	/usr/local/inotify-tools/bin/inotifywait -mrq --timefmt '%Y/%m/%d-%H:%M:%S' --format '%T %Xe %w%f' \
 		--exclude ${INOTIFY_EXCLUDE} -e modify,create,delete,attrib,close_write,move ${source_path} \
   		| while read file
 		do
@@ -42,7 +42,7 @@ inotify_fun(){
 				for ip in ${arr[@]}
 				do
 					rsync_server=$ip
-					/usr/bin/rsync -auvrtzopgP --timeout=60 --progress --include=${DIR_N} --exclude-from=${RSYNC_EXCLUDE} --bwlimit=1024 --password-file=${rsync_pwd} \
+					/usr/local/rsync/bin/rsync -auvrtzopgP --timeout=60 --progress --include=${DIR_N} --exclude-from=${RSYNC_EXCLUDE} --bwlimit=1024 --password-file=${rsync_pwd} \
 					${source_path} ${rsync_user}@${rsync_server}::${rsync_module}  >> ${LOG_FILE}
 					
 				done	
@@ -60,7 +60,7 @@ inotify_fun(){
 					for ip in ${arr[@]}
 					do
 						rsync_server=$ip
-						/usr/bin/rsync -auvrtzopgP --timeout=60 --progress --include=${DIR_N} --exclude-from=${RSYNC_EXCLUDE} --bwlimit=1024 --password-file=${rsync_pwd} \
+						/usr/local/rsync/bin/rsync -auvrtzopgP --timeout=60 --progress --include=${DIR_N} --exclude-from=${RSYNC_EXCLUDE} --bwlimit=1024 --password-file=${rsync_pwd} \
 						${source_path} ${rsync_user}@${rsync_server}::${rsync_module}  >> ${LOG_FILE}
 					done
 					
@@ -78,7 +78,7 @@ inotify_fun(){
 				for ip in ${arr[@]}
 				do
 					rsync_server=$ip
-					/usr/bin/rsync -auvrtzopgP --timeout=60 --delete --exclude-from=${RSYNC_EXCLUDE} --progress --bwlimit=1024 --password-file=${rsync_pwd} \
+					/usr/local/rsync/bin/rsync -auvrtzopgP --timeout=60 --delete --exclude-from=${RSYNC_EXCLUDE} --progress --bwlimit=1024 --password-file=${rsync_pwd} \
 					${source_path} ${rsync_user}@${rsync_server}::${rsync_module}  >> ${LOG_FILE}
 				done
 				

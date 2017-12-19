@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
-source $PATH/global.sh
+source $SHELL_PATH/global.sh
 
 LOG_PATH=$HA_PATH/keepalived/logs/install.log
 
