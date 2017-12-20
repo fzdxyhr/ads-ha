@@ -3,17 +3,11 @@ package com.ruijie.adsha.controller;
 import com.ruijie.adsha.constant.Constant;
 import com.ruijie.adsha.shell.ShellCall;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Created by YHR on 2017/12/15.
@@ -23,7 +17,10 @@ import java.util.ArrayList;
 @Slf4j
 public class ScheduledTasks {
 
-    public static String ERR_DIR = "/opt/ads-ha/ha/logs/";
+    public static String ERR_LOG_FILE_PATH = "/opt/ads-ha/WEB-INF/classes/ha/psh/Recovery_err";
+
+    @Value("${mysql.container.name}")
+    private String mysqlContainerName;
 
     //默认校验5次创建错误日志
     private int monitorTimes = Constant.MONITOR_TIMES;
@@ -38,6 +35,14 @@ public class ScheduledTasks {
         try {
             jdbcTemplate.execute(sql.toString());
             //TODO 监听tomcat docker 容器状态
+            if (!isTomcatDockerRunning(mysqlContainerName)) {
+                throw new Exception("Tomcat is fail");
+            }
+            //mysql 和tomcat 都正常时删除错误文件
+            int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "rm_dir.sh " + ERR_LOG_FILE_PATH);
+            if (result != 0) {
+                log.error("remove Recovery_err fail");
+            }
         } catch (Exception ex) {
             log.error("mysql service fail", ex);
             if (monitorTimes == 0) {
@@ -48,5 +53,13 @@ public class ScheduledTasks {
                 monitorTimes--;
             }
         }
+    }
+
+    private boolean isTomcatDockerRunning(String mysqlContainerName) {
+        int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "createErrorFile.sh " + mysqlContainerName);
+        if (result == 0) {
+            return true;
+        }
+        return false;
     }
 }

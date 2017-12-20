@@ -37,6 +37,11 @@ public class AdsHaController {
         return adsHaService.stopHa();
     }
 
+    @RequestMapping(value = "/ha/remove", method = RequestMethod.GET)
+    public ResponseInfo remove() {
+        return adsHaService.remove();
+    }
+
     @RequestMapping(value = "/ha/valid_mysql_group", method = RequestMethod.GET)
     public boolean validMysqlGroup() {
         return adsHaService.validIsConfigMasterGroup();

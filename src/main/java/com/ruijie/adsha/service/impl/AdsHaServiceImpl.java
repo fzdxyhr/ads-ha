@@ -93,12 +93,12 @@ public class AdsHaServiceImpl implements AdsHaService {
         //修改MYSQL配置文件并重启
         int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "stop_group_mysql.sh");
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived stop fail");
+            responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "group mysql stop fail");
         }
         //停止rsync
         returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_rsync.sh stop");
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived stop fail");
+            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync stop fail");
         }
         //停止keepalived
         returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_keepalived.sh stop");
@@ -115,6 +115,27 @@ public class AdsHaServiceImpl implements AdsHaService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public ResponseInfo remove() {
+        ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all stop");
+        //修改MYSQL配置文件并重启
+        int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "stop_group_mysql.sh");
+        if (returnResult != 0) {
+            responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "group mysql remove fail");
+        }
+        //卸载rsync
+        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_rsync.sh uninstall");
+        if (returnResult != 0) {
+            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync remove fail");
+        }
+        //卸载keepalived
+        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_keepalived.sh uninstall");
+        if (returnResult != 0) {
+            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived remove fail");
+        }
+        return responseInfo;
     }
 
     public boolean validIsMasterKeepalived(String virtualIp) {

@@ -1,7 +1,6 @@
 package com.ruijie.adsha.service;
 
 import com.ruijie.adsha.constant.ResponseInfo;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -17,4 +16,6 @@ public interface AdsHaService {
     ResponseInfo stopHa();
 
     boolean validIsConfigMasterGroup();
+
+    ResponseInfo remove();
 }
