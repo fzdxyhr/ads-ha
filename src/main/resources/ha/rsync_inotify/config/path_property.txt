@@ -1,2 +1,2 @@
 ﻿//格式 RSYNC_MODULE:SOURCE_PATH:RSYNC_EXCLUDE
-files_sync:/opt/test/:""
+files_sync:/opt/test/:/opt/test/no/

@@ -2,8 +2,7 @@
 
 source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $SHELL_PATH/global.sh
-LOG_PATH=$HA_PATH/ha.log
-
+LOG_PATH=$HA_PATH/rsync_inotify/switch_ha.log
 
 function switch_ha(){
 	
@@ -18,7 +17,9 @@ function switch_ha(){
 		$HA_PATH/rsync_inotify/config/rsync.sh
 	else
 		#同步一次文件
-		$HA_PATH/rsync_inotify/config/rsync_full_pull.sh $VIRTUAL_IP >> $LOG_PATH
+		$HA_PATH/rsync_inotify/config/rsync_full_pull.sh $vrrpIp & >> $LOG_PATH
 	fi
-
 }
+
+switch_ha
+exit 0

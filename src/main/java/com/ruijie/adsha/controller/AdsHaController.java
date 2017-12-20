@@ -94,5 +94,15 @@ public class AdsHaController {
         return false;
     }
 
+    @RequestMapping(value = "/ha/test4", method = RequestMethod.GET)
+    public boolean test4(@RequestParam("virtual_ip") String virtualIp) {
+        int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "validIsMasterKeepalived.sh " + virtualIp);
+//        log.info("virtualIp:" + virtualIp + "input:" + result);
+        if (result == 0) {
+            return true;
+        }
+        return false;
+    }
+
 
 }

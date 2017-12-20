@@ -3,7 +3,7 @@
 source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $SHELL_PATH/global.sh
 
-log_file=$HA_PATH/rsync_inotify/log/rsync_client.log
+log_file=$HA_PATH/rsync_inotify/rsync_client.log
 
 peerIP=$1
 if [[ ! $peerIP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

@@ -1,18 +1,14 @@
 #!/bin/bash
 
-cat path.txt | awk 'NR>1' | while read line
+
+otherIp=192.168.104.120
+
+OLD_IFS="$IFS"
+IFS=","
+arr=($otherIp)
+IFS="$OLD_IFS"
+for ip in ${arr[@]}
 do
-    echo $line
+	echo $ip
 done
 
-#!/bin/bash
-cat path.txt | awk 'NR>1' | while read line
-do
-    OLD_IFS="$IFS" 
-	IFS=":" 
-	arr=($line) 
-	IFS="$OLD_IFS" 
-	echo ${arr[0]}
-	echo ${arr[1]}
-	echo ${arr[2]}
-done

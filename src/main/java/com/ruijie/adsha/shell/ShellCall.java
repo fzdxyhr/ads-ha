@@ -12,10 +12,12 @@ public class ShellCall {
 
     public static final String COMMON_SHELL_PATH = "/opt/ads-ha/WEB-INF/classes/ha/shell/";
 
+    public static final String COMMON_SHELL_LOG_PATH = "/opt/ads-ha/WEB-INF/classes/ha/shell/";
+
 
     public static int callScript(String shellPath, String shellName, List<String> params) {
         try {
-            List<String> commandList = new LinkedList<String>();
+            List<String> commandList = new LinkedList<>();
             if (!shellPath.endsWith("/")) {
                 shellPath = shellPath + "/";
             }
@@ -33,8 +35,18 @@ public class ShellCall {
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
+                System.out.println("----------------------input--------------------------");
                 System.out.println(line);
+                System.out.println("----------------------input--------------------------");
             }
+            BufferedReader errorInput = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String errorLine;
+            while ((errorLine = errorInput.readLine()) != null) {
+                System.out.println("----------------------error--------------------------");
+                System.out.println("error:" + errorLine);
+                System.out.println("----------------------error--------------------------");
+            }
+            errorInput.close();
             input.close();
             return exitValue;
         } catch (Exception e) {
@@ -50,8 +62,18 @@ public class ShellCall {
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
+                System.out.println("----------------------input--------------------------");
                 System.out.println(line);
+                System.out.println("----------------------input--------------------------");
             }
+            BufferedReader errorInput = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String errorLine;
+            while ((errorLine = errorInput.readLine()) != null) {
+                System.out.println("----------------------error--------------------------");
+                System.out.println("error:" + errorLine);
+                System.out.println("----------------------error--------------------------");
+            }
+            errorInput.close();
             input.close();
             return exitValue;
         } catch (Exception e) {
@@ -67,6 +89,7 @@ public class ShellCall {
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
+                System.out.println(line);
                 result.append(line);
             }
             input.close();

@@ -12,7 +12,7 @@ function command_exists () {
 
 function install_keepalived () {
 	echo "$FORMAT_DATE : start install keepalived" >> $LOG_PATH
-	if command_exists keepalived; then
+	if [ -d "/usr/local/keepalived"  ];then
 		echo "$FORMAT_DATE : keepalived has been installed. skip this step" >> $LOG_PATH
 		exit 0
 	fi
@@ -46,8 +46,15 @@ function uninstall_keepalived () {
 		killall keepalived >> $LOG_PATH
 		cd $HA_PATH/tools/keepalived-1.3.9
 		make uninstall >> $LOG_PATH
-		rm $HA_PATH/tools/keepalived-1.3.9
-		rm -rf /etc/keepalived
+		if [ -e /usr/local/keepaliv$HA_PATH/tools/keepalived-1.3.9 ]; then
+			rm -rf $HA_PATH/tools/keepalived-1.3.9
+		fi
+		if [ -e /etc/keepalived ]; then
+			rm -rf /etc/keepalived
+		fi
+		if [ -e /usr/local/keepalived ]; then
+			rm -rf /usr/local/keepalived
+		fi
 		sed -i "s/$vrrpIp/vrrpIp/g" $HA_PATH/keepalived/keepalived.conf
 		sed -i "s/$interface_name/interface_name/g" $HA_PATH/keepalived/keepalived.conf
 		echo "$FORMAT_DATE : uninstall keepalived success" >> $LOG_PATH

@@ -10,6 +10,6 @@ public class Constant {
 
     public static final String MYSQL_TYPE_SLAVE = "slave";
 
-    public static final int MONITOR_TIMES = 5;
+    public static final int MONITOR_TIMES = 2;
 
 }

@@ -3,12 +3,12 @@
 source /opt/ads-ha/WEB-INF/classes/ha/shell/resource.sh
 source $SHELL_PATH/global.sh
 
-LOG_PATH=$HA_PATH/keepalived/logs/state_log.log
+LOG_PATH=$HA_PATH/keepalived/state_log.log
 
 ## 更新全局变量
 function updateGlobal(){
 	masterState="masterState=$1";
-	sed -i "s/^masterState=.*$/$masterState/g" $PATH/global.sh
+	sed -i "s/^masterState=.*$/$masterState/g" $SHELL_PATH/global.sh
 }
 
 case "$1" in
@@ -22,7 +22,7 @@ case "$1" in
 		## 将当前主机设置为主备状态
 		updateGlobal 1
 		
-		$SHELL_PATH/switch.sh switch_ha
+		$SHELL_PATH/switch.sh
 		
 		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=restart"
     ;;  
@@ -33,7 +33,7 @@ case "$1" in
 		## 将当前主机设置为备份状态
 		updateGlobal 0
 		
-		$SHELL_PATH/switch.sh switch_ha
+		$SHELL_PATH/switch.sh
 		
 		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
 		
@@ -44,7 +44,7 @@ case "$1" in
 		## 将当前主机设置为备份状态
 		updateGlobal 0
 		
-		$SHELL_PATH/switch.sh switch_ha
+		$SHELL_PATH/switch.sh
 		
 		#curl -s "http://localhost:8989/ssm/act/haServlet/tomcatRa.action?type=stop"
     ;; 

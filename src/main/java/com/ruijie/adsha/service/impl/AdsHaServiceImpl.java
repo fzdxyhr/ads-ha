@@ -41,42 +41,48 @@ public class AdsHaServiceImpl implements AdsHaService {
         }
         //安装 MYSQL
         //调用远程其他集群中的主机接口，判断是否已经配置好组复制主机
-//        List<String> otherIps = getOtherIp();
-//        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
-//        System.out.println(isExistRemoteMasterGroup);
-//        //开始安装MYSQL组复制
-//        if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
-//            System.out.println("slave");
-//            reSortIps.clear();
-//            reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
-//            reSortIps.add(mysqlContainerName);
-//            reSortIps.addAll(ips);
-//            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
-//            if (returnResult != 0) {
-//                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-//            }
-//        } else { //MYSQL组复制以本机为主,type = master
-//            System.out.println("master");
-//            reSortIps.clear();
-//            reSortIps.add(Constant.MYSQL_TYPE_MASTER);
-//            reSortIps.add(mysqlContainerName);
-//            reSortIps.addAll(ips);
-//            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
-//            if (returnResult != 0) {
-//                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-//            }
-//        }
+        List<String> otherIps = getOtherIp();
+        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
+        //开始安装MYSQL组复制
+        if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
+            log.info("slave");
+            reSortIps.clear();
+            reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
+            reSortIps.add(mysqlContainerName);
+            reSortIps.addAll(ips);
+            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+            if (returnResult != 0) {
+                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+            }
+        } else { //MYSQL组复制以本机为主,type = master
+            log.info("master");
+            reSortIps.clear();
+            reSortIps.add(Constant.MYSQL_TYPE_MASTER);
+            reSortIps.add(mysqlContainerName);
+            reSortIps.addAll(ips);
+            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+            if (returnResult != 0) {
+                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+            }
+        }
+
         reSortIps.clear();
         reSortIps.add("install");
-//        //安装 rsync
-//        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_rsync.sh", reSortIps);
-//        if (returnResult != 0) {
-//            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
-//        }
         //安装 keepalived
         returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_keepalived.sh", reSortIps);
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived start fail");
+        }
+        try {
+            Thread.sleep(5000);
+        }catch (Exception ex){}
+        //根据虚拟ip判断当前以哪台计算机为主,用于rsync初始启动的时候进行文件的同步
+        initMasterState(virtualIp);
+        //安装 rsync
+        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_rsync.sh", reSortIps);
+        if (returnResult != 0) {
+            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
+            //安装出问题，直接卸载
         }
         return responseInfo;
     }
@@ -109,6 +115,25 @@ public class AdsHaServiceImpl implements AdsHaService {
             return true;
         }
         return false;
+    }
+
+    public boolean validIsMasterKeepalived(String virtualIp) {
+        int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "validIsMasterKeepalived.sh " + virtualIp);
+        log.info("virtualIp:" + virtualIp + "input:" + result);
+        if (result == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    private void initMasterState(String virtualIp) {
+        if (validIsMasterKeepalived(virtualIp)) {//当前机为主机
+            //更新全局变量指定该机为主机
+            ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "update_global.sh 1");
+        } else {//当前机为备机
+            //更新全局变量指定该机为备机
+            ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "update_global.sh 0");
+        }
     }
 
     private boolean requestRemote(List<String> ips) {
