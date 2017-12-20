@@ -1,6 +1,5 @@
 package com.ruijie.adsha.controller;
 
-import com.ruijie.adsha.constant.Constant;
 import com.ruijie.adsha.shell.ShellCall;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +16,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ScheduledTasks {
 
-    public static String ERR_LOG_FILE_PATH = "/opt/ads-ha/WEB-INF/classes/ha/psh/Recovery_err";
-
+    @Value("${recovery.err.file.path}")
+    public  String ERR_LOG_FILE_PATH;
     @Value("${mysql.container.name}")
     private String mysqlContainerName;
+    @Value("${monitor.mysql.error.times}")
+    private int monitorErrorTimes;
 
     //默认校验5次创建错误日志
-    private int monitorTimes = Constant.MONITOR_TIMES;
+    private int monitorTimes = monitorErrorTimes;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -48,7 +49,7 @@ public class ScheduledTasks {
             if (monitorTimes == 0) {
                 //数据库服务失败,创建一个错误日志文件
                 ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "createErrorFile.sh");
-                monitorTimes = Constant.MONITOR_TIMES;
+                monitorTimes = monitorErrorTimes;
             } else {
                 monitorTimes--;
             }
