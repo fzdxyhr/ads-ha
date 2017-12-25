@@ -10,9 +10,11 @@
         var count = 1;
         function add(){
             //添加一行
-            $("#fileList").append("<input id='ip_"+count+"' class='form-control' style='width: 45%;margin-top:5px;' type='text' name='ip' placeholder='请输入名称'/>");
+            $("#fileList").append('<div>');
+            $("#fileList").append("<input id='ip_"+count+"' class='form-control input-sm' style='margin-top:6px;display:inline-block;width: 45%;' type='text' name='ip' placeholder='请输入ip地址'/>");
             //添加删除按钮
-            $("#fileList").append('<input type="button" value="-" class="btn btn-default" style="margin-top:6px;display:inline-block" onclick="deleteInput('+count+')" id="ip_del_'+count+'" >');
+            $("#fileList").append('<input type="button" value="-" class="btn btn-default" style="margin-top:6px;display:inline-block;margin-bottom:6px;margin-left:10px;" onclick="deleteInput('+count+')" id="ip_del_'+count+'" >');
+            $("#fileList").append('</div>');
             count++;
         }
         function deleteInput(id) {
@@ -28,11 +30,11 @@
 <form role="form">
     <div class="form-group" style="margin-left: 35%;">
         <label for="virtualIp">虚拟IP地址:</label>
-        <input type="text" class="form-control" style="width: 45%;" id="virtualIp" placeholder="请输入ip地址">
+        <input type="text" class="form-control input-sm" style="width: 45%;" id="virtualIp" placeholder="请输入ip地址">
     </div>
     <div class="form-group" id="fileList" style="margin-left: 35%;">
-        <label for="ip">节点IP</label>
-        <input type="text" class="form-control" style="width: 45%;" id="ip" placeholder="请输入ip地址">
+        <label for="ip">节点IP地址:</label>
+        <input type="text" class="form-control input-sm" style="width: 45%;margin-bottom:6px;" id="ip" placeholder="请输入ip地址">
     </div>
     <div style="margin-left: 62%;">
         <input type="button" class="btn btn-default" onclick="add();" value="+"/>
