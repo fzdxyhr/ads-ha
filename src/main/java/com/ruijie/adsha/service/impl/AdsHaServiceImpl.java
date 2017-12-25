@@ -26,6 +26,8 @@ public class AdsHaServiceImpl implements AdsHaService {
     private String mysqlContainerName;
     @Value("${common.shell.path}")
     private String commonShellPath;
+    @Value("${service.port}")
+    private String port;
 
     @Override
     public ResponseInfo startHa(String virtualIp, List<String> ips) {
@@ -77,7 +79,8 @@ public class AdsHaServiceImpl implements AdsHaService {
         }
         try {
             Thread.sleep(5000);
-        }catch (Exception ex){}
+        } catch (Exception ex) {
+        }
         //根据虚拟ip判断当前以哪台计算机为主,用于rsync初始启动的时候进行文件的同步
         initMasterState(virtualIp);
         //安装 rsync
@@ -162,7 +165,7 @@ public class AdsHaServiceImpl implements AdsHaService {
     private boolean requestRemote(List<String> ips) {
         try {
             for (String ip : ips) {
-                String result = HttpUtils.get("http://" + ip + ":8080/ads-ha/v1/ha/valid_mysql_group", "");
+                String result = HttpUtils.get("http://" + ip + ":" + port + "/ads-ha/v1/ha/valid_mysql_group", "");
                 if ("true".equals(result)) {
                     return true;
                 }
