@@ -24,6 +24,8 @@ public class AdsHaServiceImpl implements AdsHaService {
 
     @Value("${mysql.container.name}")
     private String mysqlContainerName;
+    @Value("${common.shell.path}")
+    private String commonShellPath;
 
     @Override
     public ResponseInfo startHa(String virtualIp, List<String> ips) {
@@ -34,7 +36,7 @@ public class AdsHaServiceImpl implements AdsHaService {
         reSortIps.add(virtualIp);
         reSortIps.addAll(ips);
         // ./init_global vistualIp ip1 ip2 ip3 ...
-        int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "init_global.sh", reSortIps);
+        int returnResult = ShellCall.callScript(commonShellPath, "init_global.sh", reSortIps);
         if (returnResult != 0) {
             //初始化失败直接返回
             return new ResponseInfo(500, "INIT/FAIL", "init global fail");
@@ -50,7 +52,7 @@ public class AdsHaServiceImpl implements AdsHaService {
             reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
             reSortIps.add(mysqlContainerName);
             reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+            returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", reSortIps);
             if (returnResult != 0) {
                 responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
             }
@@ -60,7 +62,7 @@ public class AdsHaServiceImpl implements AdsHaService {
             reSortIps.add(Constant.MYSQL_TYPE_MASTER);
             reSortIps.add(mysqlContainerName);
             reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_group_mysql.sh", reSortIps);
+            returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", reSortIps);
             if (returnResult != 0) {
                 responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
             }
@@ -69,7 +71,7 @@ public class AdsHaServiceImpl implements AdsHaService {
         reSortIps.clear();
         reSortIps.add("install");
         //安装 keepalived
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_keepalived.sh", reSortIps);
+        returnResult = ShellCall.callScript(commonShellPath, "start_keepalived.sh", reSortIps);
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived start fail");
         }
@@ -79,7 +81,7 @@ public class AdsHaServiceImpl implements AdsHaService {
         //根据虚拟ip判断当前以哪台计算机为主,用于rsync初始启动的时候进行文件的同步
         initMasterState(virtualIp);
         //安装 rsync
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH, "start_rsync.sh", reSortIps);
+        returnResult = ShellCall.callScript(commonShellPath, "start_rsync.sh", reSortIps);
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
             //安装出问题，直接卸载
@@ -91,17 +93,17 @@ public class AdsHaServiceImpl implements AdsHaService {
     public ResponseInfo stopHa() {
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all stop");
         //修改MYSQL配置文件并重启
-        int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "stop_group_mysql.sh");
+        int returnResult = ShellCall.callScript(commonShellPath + "stop_group_mysql.sh");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "group mysql stop fail");
         }
         //停止rsync
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_rsync.sh stop");
+        returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh stop");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync stop fail");
         }
         //停止keepalived
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_keepalived.sh stop");
+        returnResult = ShellCall.callScript(commonShellPath + "start_keepalived.sh stop");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived stop fail");
         }
@@ -110,7 +112,7 @@ public class AdsHaServiceImpl implements AdsHaService {
 
     @Override
     public boolean validIsConfigMasterGroup() {
-        int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "validIsConfigMasterGroup.sh loose-group");
+        int result = ShellCall.callScript(commonShellPath + "validIsConfigMasterGroup.sh loose-group");
         if (result == 0) {
             return true;
         }
@@ -121,17 +123,17 @@ public class AdsHaServiceImpl implements AdsHaService {
     public ResponseInfo remove() {
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all stop");
         //修改MYSQL配置文件并重启
-        int returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "stop_group_mysql.sh");
+        int returnResult = ShellCall.callScript(commonShellPath + "stop_group_mysql.sh");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "group mysql remove fail");
         }
         //卸载rsync
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_rsync.sh uninstall");
+        returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh uninstall");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync remove fail");
         }
         //卸载keepalived
-        returnResult = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "start_keepalived.sh uninstall");
+        returnResult = ShellCall.callScript(commonShellPath + "start_keepalived.sh uninstall");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived remove fail");
         }
@@ -139,7 +141,7 @@ public class AdsHaServiceImpl implements AdsHaService {
     }
 
     public boolean validIsMasterKeepalived(String virtualIp) {
-        int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "validIsMasterKeepalived.sh " + virtualIp);
+        int result = ShellCall.callScript(commonShellPath + "validIsMasterKeepalived.sh " + virtualIp);
         log.info("virtualIp:" + virtualIp + "input:" + result);
         if (result == 0) {
             return true;
@@ -150,10 +152,10 @@ public class AdsHaServiceImpl implements AdsHaService {
     private void initMasterState(String virtualIp) {
         if (validIsMasterKeepalived(virtualIp)) {//当前机为主机
             //更新全局变量指定该机为主机
-            ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "update_global.sh 1");
+            ShellCall.callScript(commonShellPath + "update_global.sh 1");
         } else {//当前机为备机
             //更新全局变量指定该机为备机
-            ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "update_global.sh 0");
+            ShellCall.callScript(commonShellPath + "update_global.sh 0");
         }
     }
 
@@ -174,7 +176,7 @@ public class AdsHaServiceImpl implements AdsHaService {
     //从global.sh文件中获取除本机ip的其他ip
     public List<String> getOtherIp() {
         List<String> result = new ArrayList<>();
-        String ipString = ShellCall.callScriptString(ShellCall.COMMON_SHELL_PATH + "sed_value.sh");
+        String ipString = ShellCall.callScriptString(commonShellPath + "sed_value.sh");
         if (StringUtils.isEmpty(ipString)) {
             return Collections.emptyList();
         }
