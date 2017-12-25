@@ -28,7 +28,6 @@ public class AdsHaController {
 
     @RequestMapping(value = "/ha/start", method = RequestMethod.GET)
     public ResponseInfo startHa(@RequestParam("virtual_ip") String virtualIp, @RequestParam("ips") List<String> ips) {
-
         return adsHaService.startHa(virtualIp, ips);
     }
 
