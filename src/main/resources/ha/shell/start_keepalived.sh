@@ -32,7 +32,7 @@ function install_keepalived () {
 	cp $HA_PATH/keepalived/keepalived.conf /etc/keepalived/keepalived.conf
 	echo $vrrpIp >> $LOG_PATH
 	##启动keepalived
-	/usr/local/keepalived/sbin/keepalived
+	start
 	echo "$FORMAT_DATE : install keepalived success"  >> $LOG_PATH
 	
 }
@@ -74,7 +74,10 @@ function stop(){
 
 
 function start(){
-	/usr/local/keepalived/sbin/keepalived
+	result=$(ps -e|grep 'keepalived')
+	if [ -z "$result" ]; then
+		/usr/local/keepalived/sbin/keepalived >> $LOG_PATH
+	fi
 }
 function uninstall(){
 	uninstall_keepalived

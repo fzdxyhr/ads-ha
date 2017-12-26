@@ -18,4 +18,6 @@ public interface AdsHaService {
     boolean validIsConfigMasterGroup();
 
     ResponseInfo remove();
+
+    boolean validAdsIsNormal();
 }

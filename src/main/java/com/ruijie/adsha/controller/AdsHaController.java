@@ -20,33 +20,38 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("/ads-ha")
 public class AdsHaController {
 
     @Autowired
     private AdsHaService adsHaService;
 
-    @RequestMapping(value = "/ha/start", method = RequestMethod.GET)
+    @RequestMapping(value = "/start", method = RequestMethod.GET)
     public ResponseInfo startHa(@RequestParam("virtual_ip") String virtualIp, @RequestParam("ips") List<String> ips) {
         return adsHaService.startHa(virtualIp, ips);
     }
 
-    @RequestMapping(value = "/ha/stop", method = RequestMethod.GET)
+    @RequestMapping(value = "/stop", method = RequestMethod.GET)
     public ResponseInfo stopHa() {
         return adsHaService.stopHa();
     }
 
-    @RequestMapping(value = "/ha/remove", method = RequestMethod.GET)
+    @RequestMapping(value = "/remove", method = RequestMethod.GET)
     public ResponseInfo remove() {
         return adsHaService.remove();
     }
 
-    @RequestMapping(value = "/ha/valid_mysql_group", method = RequestMethod.GET)
+    @RequestMapping(value = "/is_normal", method = RequestMethod.GET)
+    public boolean validAdsIsNormal() {
+        return adsHaService.validAdsIsNormal();
+    }
+
+    @RequestMapping(value = "/valid_mysql_group", method = RequestMethod.GET)
     public boolean validMysqlGroup() {
         return adsHaService.validIsConfigMasterGroup();
     }
 
-    @RequestMapping(value = "/ha/test", method = RequestMethod.GET)
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
     public ResponseInfo test(@RequestParam("virtual_ip") String virtualIp, @RequestParam("ips") List<String> ips) {
         List<String> reSortIps = new ArrayList<>();
         //虚拟ip放在最前面作为sh脚本的参数，具体传值可以查看对应的脚本注释
@@ -61,7 +66,7 @@ public class AdsHaController {
         return new ResponseInfo(200, "SUCCESS", "init global success");
     }
 
-    @RequestMapping(value = "/ha/test2", method = RequestMethod.GET)
+    @RequestMapping(value = "/test2", method = RequestMethod.GET)
     public List<String> getOtherIp() {
         List<String> result = new ArrayList<>();
         String ipString = ShellCall.callScriptString(ShellCall.COMMON_SHELL_PATH + "sed_value.sh");
@@ -77,7 +82,7 @@ public class AdsHaController {
 
     }
 
-    @RequestMapping(value = "/ha/test3", method = RequestMethod.GET)
+    @RequestMapping(value = "/test3", method = RequestMethod.GET)
     public boolean test3() {
         List<String> result = new ArrayList<>();
         String ipString = ShellCall.callScriptString(ShellCall.COMMON_SHELL_PATH + "sed_value.sh");
@@ -98,7 +103,7 @@ public class AdsHaController {
         return false;
     }
 
-    @RequestMapping(value = "/ha/test4", method = RequestMethod.GET)
+    @RequestMapping(value = "/test4", method = RequestMethod.GET)
     public boolean test4(@RequestParam("virtual_ip") String virtualIp) {
         int result = ShellCall.callScript(ShellCall.COMMON_SHELL_PATH + "validIsMasterKeepalived.sh " + virtualIp);
 //        log.info("virtualIp:" + virtualIp + "input:" + result);

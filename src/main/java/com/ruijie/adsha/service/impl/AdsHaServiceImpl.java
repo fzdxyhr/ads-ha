@@ -87,7 +87,6 @@ public class AdsHaServiceImpl implements AdsHaService {
         returnResult = ShellCall.callScript(commonShellPath, "start_rsync.sh", reSortIps);
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
-            //安装出问题，直接卸载
         }
         return responseInfo;
     }
@@ -141,6 +140,11 @@ public class AdsHaServiceImpl implements AdsHaService {
             responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived remove fail");
         }
         return responseInfo;
+    }
+
+    @Override
+    public boolean validAdsIsNormal() {
+        return false;
     }
 
     public boolean validIsMasterKeepalived(String virtualIp) {

@@ -35,7 +35,7 @@ public class ScheduledTasks {
         sql.append("select 1");
         try {
             jdbcTemplate.execute(sql.toString());
-            //TODO 监听tomcat docker 容器状态
+            //监听tomcat docker 容器状态
             if (!isTomcatDockerRunning(mysqlContainerName)) {
                 throw new Exception("Tomcat is fail");
             }
