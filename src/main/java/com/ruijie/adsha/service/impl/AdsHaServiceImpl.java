@@ -177,4 +177,11 @@ public class AdsHaServiceImpl implements AdsHaService {
         }
         return result;
     }
+
+    private void uninstall(String command) {
+        int returnResult = ShellCall.callScript(commonShellPath + command);
+        if (returnResult != 0) {
+            log.info(command + "run is fail");
+        }
+    }
 }
