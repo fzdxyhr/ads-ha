@@ -27,8 +27,6 @@ import java.util.List;
 @Slf4j
 public class AdsHaServiceImpl implements AdsHaService {
 
-    @Value("${mysql.container.name}")
-    private String mysqlContainerName;
     @Value("${common.shell.path}")
     private String commonShellPath;
     @Value("${service.port}")
@@ -148,34 +146,6 @@ public class AdsHaServiceImpl implements AdsHaService {
             //更新全局变量指定该机为备机
             ShellCall.callScript(commonShellPath + "update_global.sh 0");
         }
-    }
-
-    private boolean requestRemote(List<String> ips) {
-        try {
-            for (String ip : ips) {
-                String result = HttpUtils.get("http://" + ip + ":" + port + "/ads-ha/v1/ha/valid_mysql_group", "");
-                if ("true".equals(result)) {
-                    return true;
-                }
-            }
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-        }
-        return false;
-    }
-
-    //从global.sh文件中获取除本机ip的其他ip
-    public List<String> getOtherIp() {
-        List<String> result = new ArrayList<>();
-        String ipString = ShellCall.callScriptString(commonShellPath + "sed_value.sh");
-        if (StringUtils.isEmpty(ipString)) {
-            return Collections.emptyList();
-        }
-        String[] ips = ipString.split(",");
-        for (String ip : ips) {
-            result.add(ip);
-        }
-        return result;
     }
 
     private void uninstall(String command) {
