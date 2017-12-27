@@ -20,27 +20,31 @@ public class RsyncServiceImpl implements RsyncService {
     private String commonShellPath;
 
     @Override
-    public ResponseInfo install() {
+    public boolean install() {
         //安装 rsync
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
+        boolean result = true;
         List<String> params = new ArrayList<>();
         params.add("install");
         int returnResult = ShellCall.callScript(commonShellPath, "start_rsync.sh", params);
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync install/start fail");
+//            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync install/start fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override
-    public ResponseInfo start() {
+    public boolean start() {
+        boolean result = true;
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开启keepalived
         int returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh start");
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
+//            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override

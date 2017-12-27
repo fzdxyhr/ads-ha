@@ -9,9 +9,9 @@ import java.util.List;
  */
 public interface MysqlGroupService {
 
-    ResponseInfo install(List<String> ips);
+    boolean install(List<String> ips);
 
-    ResponseInfo start(List<String> ips);
+    boolean start(List<String> ips);
 
     ResponseInfo stop();
 

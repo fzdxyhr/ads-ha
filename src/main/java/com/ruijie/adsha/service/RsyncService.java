@@ -7,9 +7,9 @@ import com.ruijie.adsha.constant.ResponseInfo;
  */
 public interface RsyncService {
 
-    ResponseInfo install();
+    boolean install();
 
-    ResponseInfo start();
+    boolean start();
 
     ResponseInfo stop();
 

@@ -30,13 +30,13 @@ public class MysqlGroupServiceImpl implements MysqlGroupService {
     private String port;
 
     @Override
-    public ResponseInfo install(List<String> ips) {
-       return null;
+    public boolean install(List<String> ips) {
+        return false;
     }
 
     @Override
-    public ResponseInfo start(List<String> ips) {
-        ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
+    public boolean start(List<String> ips) {
+        boolean result = true;
         List<String> params = new ArrayList<>();
         int returnResult;
         //调用远程其他集群中的主机接口，判断是否已经配置好组复制主机
@@ -51,7 +51,7 @@ public class MysqlGroupServiceImpl implements MysqlGroupService {
             params.addAll(ips);
             returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", params);
             if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+                result = false;
             }
         } else { //MYSQL组复制以本机为主,type = master
             log.info("start master config");
@@ -61,10 +61,10 @@ public class MysqlGroupServiceImpl implements MysqlGroupService {
             params.addAll(ips);
             returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", params);
             if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
+                result = false;
             }
         }
-        return responseInfo;
+        return result;
     }
 
     @Override

@@ -20,27 +20,30 @@ public class KeepalivedServiceImpl implements KeepalivedService {
     private String commonShellPath;
 
     @Override
-    public ResponseInfo install() {
+    public boolean install() {
+        boolean result = true;
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         List<String> params = new ArrayList<>();
         params.add("install");
         //安装 keepalived
         int returnResult = ShellCall.callScript(commonShellPath, "start_keepalived.sh", params);
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived install/start fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override
-    public ResponseInfo start() {
+    public boolean start() {
+        boolean result = true;
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开启keepalived
         int returnResult = ShellCall.callScript(commonShellPath + "start_keepalived.sh start");
         if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived start fail");
+//            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived start fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override

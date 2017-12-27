@@ -3,12 +3,17 @@ package com.ruijie.adsha.service.impl;
 import com.ruijie.adsha.constant.Constant;
 import com.ruijie.adsha.constant.ResponseInfo;
 import com.ruijie.adsha.service.AdsHaService;
+import com.ruijie.adsha.service.KeepalivedService;
+import com.ruijie.adsha.service.MysqlGroupService;
+import com.ruijie.adsha.service.RsyncService;
 import com.ruijie.adsha.shell.ShellCall;
 import com.ruijie.adsha.util.HttpUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import sun.net.www.http.KeepAliveCache;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,10 +33,16 @@ public class AdsHaServiceImpl implements AdsHaService {
     private String commonShellPath;
     @Value("${service.port}")
     private String port;
+    @Autowired
+    private MysqlGroupService mysqlGroupService;
+    @Autowired
+    private KeepalivedService keepalivedService;
+    @Autowired
+    private RsyncService rsyncService;
 
     @Override
     public ResponseInfo startHa(String virtualIp, List<String> ips) {
-        ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all start");
+        ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开始执行初始化文件，调用init_global.sh脚本进行全局数据的初始化
         List<String> reSortIps = new ArrayList<>();
         //虚拟ip放在最前面作为sh脚本的参数，具体传值可以查看对应的脚本注释
@@ -43,39 +54,13 @@ public class AdsHaServiceImpl implements AdsHaService {
             //初始化失败直接返回
             return new ResponseInfo(500, "INIT/FAIL", "init global fail");
         }
-        //安装 MYSQL
-        //调用远程其他集群中的主机接口，判断是否已经配置好组复制主机
-        List<String> otherIps = getOtherIp();
-        boolean isExistRemoteMasterGroup = requestRemote(otherIps);
-        //开始安装MYSQL组复制
-        if (isExistRemoteMasterGroup) {//MYSQL组复制已被集群中其他计算机配置，本机按照配机添加 type=slave
-            log.info("slave");
-            reSortIps.clear();
-            reSortIps.add(Constant.MYSQL_TYPE_SLAVE);
-            reSortIps.add(mysqlContainerName);
-            reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", reSortIps);
-            if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-            }
-        } else { //MYSQL组复制以本机为主,type = master
-            log.info("master");
-            reSortIps.clear();
-            reSortIps.add(Constant.MYSQL_TYPE_MASTER);
-            reSortIps.add(mysqlContainerName);
-            reSortIps.addAll(ips);
-            returnResult = ShellCall.callScript(commonShellPath, "start_group_mysql.sh", reSortIps);
-            if (returnResult != 0) {
-                responseInfo = new ResponseInfo(500, "MYSQL/FAIL", "mysql start fail");
-            }
+        //配置 MYSQL
+        if (mysqlGroupService.start(ips)) {
+            return new ResponseInfo(500, "MYSQL/FAIL", "group mysql start/install fail");
         }
-
-        reSortIps.clear();
-        reSortIps.add("install");
-        //安装 keepalived
-        returnResult = ShellCall.callScript(commonShellPath, "start_keepalived.sh", reSortIps);
-        if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived start fail");
+        //安装 Keepalived
+        if (keepalivedService.install()) {
+            return new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived install/start fail");
         }
         try {
             Thread.sleep(5000);
@@ -84,9 +69,8 @@ public class AdsHaServiceImpl implements AdsHaService {
         //根据虚拟ip判断当前以哪台计算机为主,用于rsync初始启动的时候进行文件的同步
         initMasterState(virtualIp);
         //安装 rsync
-        returnResult = ShellCall.callScript(commonShellPath, "start_rsync.sh", reSortIps);
-        if (returnResult != 0) {
-            responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync start fail");
+        if (rsyncService.install()) {
+            return new ResponseInfo(500, "RSYNC/FAIL", "rsync install/start fail");
         }
         return responseInfo;
     }
