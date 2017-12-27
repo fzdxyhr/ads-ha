@@ -27,14 +27,20 @@ function install_keepalived () {
 	./configure --prefix=/usr/local/keepalived >> $LOG_PATH
 	make && make install >> $LOG_PATH
 	mkdir /etc/keepalived/
-	sed -i "s/vrrpIp/$vrrpIp/g" $HA_PATH/keepalived/keepalived.conf
-	sed -i "s/interface_name/$interface_name/g" $HA_PATH/keepalived/keepalived.conf
+	sed -i "s/ads_virtual_ip/$vrrpIp/g" $HA_PATH/keepalived/keepalived.conf
+	sed -i "s/ads_interface_name/$interface_name/g" $HA_PATH/keepalived/keepalived.conf
 	cp $HA_PATH/keepalived/keepalived.conf /etc/keepalived/keepalived.conf
-	echo $vrrpIp >> $LOG_PATH
 	##启动keepalived
 	start
 	echo "$FORMAT_DATE : install keepalived success"  >> $LOG_PATH
 	
+}
+
+function config(){
+	sed -i "s/ads_virtual_ip/$vrrpIp/g" /etc/keepalived/keepalived.conf
+	sed -i "s/ads_interface_name/$interface_name/g" /etc/keepalived/keepalived.conf
+	##启动keepalived
+	start
 }
 
 function uninstall_keepalived () {

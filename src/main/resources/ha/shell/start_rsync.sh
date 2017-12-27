@@ -79,7 +79,6 @@ function uninstall_rsync () {
 		if [ -e /usr/local/rsync ]; then
 			rm -rf /usr/local/rsync
 		fi
-
 		echo "$FORMAT_DATE : uninstall rsync success" >> $LOG_PATH
 	fi
 }
@@ -139,6 +138,32 @@ function install(){
 
 }
 
+function config(){
+	chmod 600 $HA_PATH/rsync_inotify/config/rsync_client.passwd
+	chmod 600 $HA_PATH/rsync_inotify/config/rsync.passwd
+	chmod 600 $HA_PATH/rsync_inotify/config/rsyncd.conf
+	chmod 600 $HA_PATH/rsync_inotify/config/rsync_exclude.lst
+
+	chmod 777 $HA_PATH/rsync_inotify/config/rsync.sh
+	chmod 777 $HA_PATH/rsync_inotify/config/rsync_full_pull_common.sh
+	chmod 777 $HA_PATH/rsync_inotify/config/rsync_full_pull.sh
+
+	#start rsync service
+	/usr/local/rsync/bin/rsync --daemon --config=$HA_PATH/rsync_inotify/config/rsyncd.conf
+	sleep 2
+	pid=`ps -ef|grep $HA_PATH/rsync_inotify/config/rsyncd.conf |grep -v 'grep' |awk '{print $2}'`
+	if [ "$pid" ];then
+		echo "$FORMAT_DATE : rsync service start success" >> $LOG_PATH
+	else
+		echo "$FORMAT_DATE : rsync service unable to start. Please see the installation log" >> $LOG_PATH
+		exit 1
+	fi
+	##安装inotify
+	install_inotify
+	##启动监听
+	$SHELL_PATH/switch.sh
+}
+
 function start(){
 	result=$(ps -e|grep 'rsync')
 	if [ -z "$result" ]; then
@@ -150,6 +175,11 @@ function stop(){
 	result=$(ps -e|grep 'rsync')
 	if [ -n "$result" ]; then
 		killall rsync
+	fi
+
+	result=$(ps -e|grep 'inotifywait')
+	if [ -n "$result" ]; then
+		$(`ps -ef | grep inotifywait |grep -v 'grep' | awk '{print $2}'  | xargs kill -9`)
 	fi
 }
 

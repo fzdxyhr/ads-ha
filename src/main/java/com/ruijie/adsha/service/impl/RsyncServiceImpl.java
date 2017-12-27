@@ -48,29 +48,39 @@ public class RsyncServiceImpl implements RsyncService {
     }
 
     @Override
-    public ResponseInfo stop() {
+    public boolean stop() {
+        boolean result = true;
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开启keepalived
         int returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh stop");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync stop fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override
-    public ResponseInfo uninstall() {
+    public boolean uninstall() {
+        boolean result = true;
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开启keepalived
         int returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh uninstall");
         if (returnResult != 0) {
             responseInfo = new ResponseInfo(500, "RSYNC/FAIL", "rsync uninstall fail");
+            result = false;
         }
-        return responseInfo;
+        return result;
     }
 
     @Override
-    public ResponseInfo config() {
-        return null;
+    public boolean config() {
+        boolean result = true;
+        //配置并开启start_rsync
+        int returnResult = ShellCall.callScript(commonShellPath + "start_rsync.sh config");
+        if (returnResult != 0) {
+            result = false;
+        }
+        return result;
     }
 }
