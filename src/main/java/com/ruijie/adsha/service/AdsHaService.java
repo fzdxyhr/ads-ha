@@ -20,4 +20,6 @@ public interface AdsHaService {
     ResponseInfo remove();
 
     boolean validAdsIsNormal();
+
+    ResponseInfo install(String virtualIp, List<String> ips);
 }

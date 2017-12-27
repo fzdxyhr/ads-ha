@@ -42,12 +42,12 @@ public class AdsHaServiceImpl implements AdsHaService {
     public ResponseInfo startHa(String virtualIp, List<String> ips) {
         ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
         //开始执行初始化文件，调用init_global.sh脚本进行全局数据的初始化
-        List<String> reSortIps = new ArrayList<>();
+        List<String> params = new ArrayList<>();
         //虚拟ip放在最前面作为sh脚本的参数，具体传值可以查看对应的脚本注释
-        reSortIps.add(virtualIp);
-        reSortIps.addAll(ips);
+        params.add(virtualIp);
+        params.addAll(ips);
         // ./init_global vistualIp ip1 ip2 ip3 ...
-        int returnResult = ShellCall.callScript(commonShellPath, "init_global.sh", reSortIps);
+        int returnResult = ShellCall.callScript(commonShellPath, "init_global.sh", params);
         if (returnResult != 0) {
             //初始化失败直接返回
             return new ResponseInfo(500, "INIT/FAIL", "init global fail");
@@ -127,6 +127,41 @@ public class AdsHaServiceImpl implements AdsHaService {
     @Override
     public boolean validAdsIsNormal() {
         return false;
+    }
+
+    @Override
+    public ResponseInfo install(String virtualIp, List<String> ips) {
+        ResponseInfo responseInfo = new ResponseInfo(200, "SUCCESS", "all success");
+        //开始执行初始化文件，调用init_global.sh脚本进行全局数据的初始化
+        List<String> reSortIps = new ArrayList<>();
+        //虚拟ip放在最前面作为sh脚本的参数，具体传值可以查看对应的脚本注释
+        reSortIps.add(virtualIp);
+        reSortIps.addAll(ips);
+        // ./init_global vistualIp ip1 ip2 ip3 ...
+        int returnResult = ShellCall.callScript(commonShellPath, "init_global.sh", reSortIps);
+        if (returnResult != 0) {
+            //初始化失败直接返回
+            return new ResponseInfo(500, "INIT/FAIL", "init global fail");
+        }
+        //配置 MYSQL
+        if (mysqlGroupService.start(ips)) {
+            return new ResponseInfo(500, "MYSQL/FAIL", "group mysql start/install fail");
+        }
+        //安装 Keepalived
+        if (keepalivedService.install()) {
+            return new ResponseInfo(500, "KEEPALIVED/FAIL", "keepalived install/start fail");
+        }
+        try {
+            Thread.sleep(5000);
+        } catch (Exception ex) {
+        }
+        //根据虚拟ip判断当前以哪台计算机为主,用于rsync初始启动的时候进行文件的同步
+        initMasterState(virtualIp);
+        //安装 rsync
+        if (rsyncService.install()) {
+            return new ResponseInfo(500, "RSYNC/FAIL", "rsync install/start fail");
+        }
+        return responseInfo;
     }
 
     public boolean validIsMasterKeepalived(String virtualIp) {

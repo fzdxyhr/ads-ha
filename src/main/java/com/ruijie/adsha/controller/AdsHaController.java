@@ -31,6 +31,11 @@ public class AdsHaController {
         return adsHaService.startHa(virtualIp, ips);
     }
 
+    @RequestMapping(value = "/install", method = RequestMethod.GET)
+    public ResponseInfo install(@RequestParam("virtual_ip") String virtualIp, @RequestParam("ips") List<String> ips) {
+        return adsHaService.startHa(virtualIp, ips);
+    }
+
     @RequestMapping(value = "/stop", method = RequestMethod.GET)
     public ResponseInfo stopHa() {
         return adsHaService.stopHa();

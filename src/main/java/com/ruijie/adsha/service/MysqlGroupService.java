@@ -17,4 +17,6 @@ public interface MysqlGroupService {
 
     ResponseInfo uninstall();
 
+    ResponseInfo config();
+
 }
