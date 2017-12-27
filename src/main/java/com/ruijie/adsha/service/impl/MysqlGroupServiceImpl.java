@@ -30,11 +30,6 @@ public class MysqlGroupServiceImpl implements MysqlGroupService {
     private String port;
 
     @Override
-    public ResponseInfo config() {
-        return null;
-    }
-
-    @Override
     public boolean install(List<String> ips) {
         return false;
     }
@@ -85,6 +80,11 @@ public class MysqlGroupServiceImpl implements MysqlGroupService {
 
     @Override
     public ResponseInfo uninstall() {
+        return null;
+    }
+
+    @Override
+    public ResponseInfo config() {
         return null;
     }
 
